@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Tracker</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="title_activity_current_place">Map</string>
+    <string name="map_key" translatable="false">Enter your google API key here</string>
+    <string name="get_position">get Position</string>
+    <string name="distanceViewText">distance ...</string>
+</resources>
