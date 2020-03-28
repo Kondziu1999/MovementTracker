@@ -1,9 +1,14 @@
 package com.example.tracker;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -11,6 +16,7 @@ import android.widget.Toast;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.FragmentActivity;
 
+import com.example.tracker.services.LocalizationService;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -36,7 +42,6 @@ import java.util.List;
 public class MapsActivity extends FragmentActivity
         implements OnMapReadyCallback,
         GoogleMap.OnPolylineClickListener,
-        GoogleMap.OnPolygonClickListener,
         GoogleMap.OnMarkerClickListener
 {
     private static final int COLOR_RED_ARGB=0xff6550;
@@ -57,13 +62,16 @@ public class MapsActivity extends FragmentActivity
     private LocationTrack locationTrack;
 
     private Handler handler;
-    int delay=10000;
+    int DELAY=10000;
     double LAST_CAPTURED_LONGITUDE=20.760;
     double LAST_CAPTURED_LATITUDE= 50.840;
     private List<LatLanHolder> locations= new LinkedList<>();
     private static double TOTAL_DISTANCE=0;
     private TextView distanceView;
-
+    private LocalizationService mLocalizationService;
+    private boolean mBound;
+    private Handler refreshHandler;
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,30 +80,62 @@ public class MapsActivity extends FragmentActivity
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        //locationTrack= new LocationTrack(this);
+
         distanceView=findViewById(R.id.distanceView);
+        //locations.add(new LatLanHolder(LAST_CAPTURED_LATITUDE,LAST_CAPTURED_LONGITUDE));
+        //locations.add(new LatLanHolder(LAST_CAPTURED_LATITUDE+0.008,LAST_CAPTURED_LONGITUDE+0.004));
 
-        locations.add(new LatLanHolder(LAST_CAPTURED_LATITUDE,LAST_CAPTURED_LONGITUDE));
-        locations.add(new LatLanHolder(LAST_CAPTURED_LATITUDE+0.008,LAST_CAPTURED_LONGITUDE+0.004));
+//        handler=new Handler();
+//        //run fetching user localization every 10 sec
+//        handler.postDelayed(new Runnable() {
+//                @RequiresApi(api = Build.VERSION_CODES.N)
+//                @Override
+//                public void run() {
+//                    getLocation();
+//                    handler.postDelayed(this, delay);
+//                }
+//            }, delay);
 
-        handler=new Handler();
-        //run fetching user localization every 10 sec
-        handler.postDelayed(new Runnable() {
-                @RequiresApi(api = Build.VERSION_CODES.N)
-                @Override
-                public void run() {
-                    getLocation();
-                    handler.postDelayed(this, delay);
-                }
-            }, delay);
+        //////////////////////////////////////////////
+        //start Localization service and bind it
+        Intent intent= new Intent(this,LocalizationService.class);
+       // startService(intent);
+        startForegroundService(intent);
+        bindService(intent,connection, Context.BIND_AUTO_CREATE);
+        ////////////////////////////////
+        setRefreshLocalizationTimeout(DELAY);
 
     }
+
+    private void setRefreshLocalizationTimeout(long timeout){
+        refreshHandler=new Handler();
+        refreshHandler.postDelayed(new Runnable() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void run() {
+                onResume();
+                refreshHandler.postDelayed(this, timeout);
+            }
+        }, timeout);
+    }
+    //connection to service
+    private ServiceConnection connection= new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            LocalizationService.LocalBinder binder= (LocalizationService.LocalBinder) service;
+            mLocalizationService=binder.getService();
+            mBound=true;
+        }
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mBound=false;
+        }
+    };
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
         PolylineOptions polylineOptions=new PolylineOptions()
                 .clickable(true);
         //add points to polyline
@@ -107,7 +147,6 @@ public class MapsActivity extends FragmentActivity
                             new MarkerOptions().position(position).title("extra point :) \n lat: "+position.latitude+" \n lon :"+position.longitude)
                     );
                 });
-
         polyline=googleMap.addPolyline(polylineOptions);
         polyline.setTag("A");
         // Style the polyline.
@@ -117,7 +156,6 @@ public class MapsActivity extends FragmentActivity
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(LAST_CAPTURED_LATITUDE, LAST_CAPTURED_LONGITUDE),20));
         googleMap.setOnPolylineClickListener(this);
         googleMap.setOnMarkerClickListener(this);
-
     }
 
     //refresh map
@@ -125,11 +163,23 @@ public class MapsActivity extends FragmentActivity
     @Override
     protected void onResume() {
         super.onResume();
-        if(ifLocationToAdd && mMap!=null){
-            mMap.clear();
-            onMapReady(mMap);
-            refreshDistance();
-            ifLocationToAdd=false;
+//        if(ifLocationToAdd && mMap!=null){
+//            mMap.clear();
+//            onMapReady(mMap);
+//            refreshDistance();
+//            ifLocationToAdd=false;
+//        }
+        //if there  are locations to display
+        if(mLocalizationService!=null && !mLocalizationService.getLocations().isEmpty()){
+            //if something changed
+            if(mLocalizationService.getLocations().size()>=locations.size()){
+                locations=mLocalizationService.getLocations();
+                LAST_CAPTURED_LATITUDE=locations.get(locations.size()-1).getLat();
+                LAST_CAPTURED_LONGITUDE=locations.get(locations.size()-1).getLan();
+                mMap.clear();
+                onMapReady(mMap);
+                refreshDistance();
+            }
         }
     }
 
@@ -150,16 +200,11 @@ public class MapsActivity extends FragmentActivity
                 polyline.setStartCap(new RoundCap());
                 break;
         }
-
         polyline.setEndCap(new RoundCap());
         polyline.setJointType(JointType.BEVEL);
         polyline.setWidth(POLYLINE_STROKE_WIDTH_PX);
         polyline.setColor(Color.RED);
         polyline.setJointType(JointType.ROUND);
-    }
-    @Override
-    public void onPolygonClick(Polygon polygon) {
-
     }
 
     @Override
@@ -175,36 +220,39 @@ public class MapsActivity extends FragmentActivity
     }
 
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    public void getLocation() {
-        //create LocationTrack obj to get info
-        //TODO check if LocationTrack can be singleton class
-        locationTrack=new LocationTrack(this);
-        if(locationTrack.canGetLocation()){
-            //valid results
-            //current values
-            double lanCurr=locationTrack.getLongitude();
-            double latCurr=locationTrack.getLatitude();
-            double lanLast=locations.get(locations.size()-1).lan;
-            double latLast=locations.get(locations.size()-1).lat;
-            //if change of distance is grater than 10m add point
-            double distance=DistanceCalculator.distance(latCurr,lanCurr,latLast,lanLast,"K");
-            if(distance>VALID_DISTANCE_BETWEEN_SAMPLES){
-                locations.add(new LatLanHolder(latCurr,lanCurr));
-                ifLocationToAdd=true;
-                TOTAL_DISTANCE+=distance;
-                LAST_CAPTURED_LATITUDE=latCurr;
-                LAST_CAPTURED_LONGITUDE=lanLast;
-                onResume();
-            }
-
-            Toast.makeText(this,"lat : "+locationTrack.getLatitude()+" \n lan: "+locationTrack.getLongitude(),Toast.LENGTH_SHORT).show();
-        }
-    }
+//    @RequiresApi(api = Build.VERSION_CODES.N)
+//    public void getLocation() {
+//        //create LocationTrack obj to get info
+//        //TODO check if LocationTrack can be singleton class
+//        locationTrack=new LocationTrack(this);
+//        if(locationTrack.canGetLocation()){
+//            //valid results
+//            //current values
+//            double lanCurr=locationTrack.getLongitude();
+//            double latCurr=locationTrack.getLatitude();
+//            double lanLast=locations.get(locations.size()-1).lan;
+//            double latLast=locations.get(locations.size()-1).lat;
+//            //if change of distance is grater than 10m add point
+//            double distance=DistanceCalculator.distance(latCurr,lanCurr,latLast,lanLast,"K");
+//            if(distance>VALID_DISTANCE_BETWEEN_SAMPLES){
+//                locations.add(new LatLanHolder(latCurr,lanCurr));
+//                ifLocationToAdd=true;
+//                TOTAL_DISTANCE+=distance;
+//                LAST_CAPTURED_LATITUDE=latCurr;
+//                LAST_CAPTURED_LONGITUDE=lanLast;
+//                onResume();
+//            }
+//
+//            Toast.makeText(this,"lat : "+locationTrack.getLatitude()+" \n lan: "+locationTrack.getLongitude(),Toast.LENGTH_SHORT).show();
+//        }
+//    }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void getPosition(View view) {
-        getLocation();
+        List<LatLanHolder> locationsInternal=mLocalizationService.getLocations();
+        LatLanHolder holder=locationsInternal.get(locationsInternal.size()-1);
+        locations=mLocalizationService.getLocations();
+        Toast.makeText(this,LAST_CAPTURED_LATITUDE+" "+LAST_CAPTURED_LONGITUDE,Toast.LENGTH_LONG ).show();
     }
 
     @Override
@@ -215,8 +263,10 @@ public class MapsActivity extends FragmentActivity
         // marker is centered and for the marker's info window to open, if it has one).
         return false;
     }
+
     private void refreshDistance(){
-        String distanceSting=String.valueOf(TOTAL_DISTANCE);
-        distanceView.setText(distanceSting.substring(0,5));
+        //String distanceSting=String.valueOf(TOTAL_DISTANCE);
+        //distanceView.setText(distanceSting.substring(0,5));
+        distanceView.setText(String.valueOf(mLocalizationService.getTotalDistance()));
     }
 }
