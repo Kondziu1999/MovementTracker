@@ -1,26 +1,22 @@
 package com.example.tracker.services;
 
-import android.annotation.SuppressLint;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
-import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
-import android.text.format.Time;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 
 import com.example.tracker.DistanceCalculator;
-import com.example.tracker.LatLanHolder;
+import com.example.tracker.database.FirebaseDataService;
+import com.example.tracker.models.LatLanHolder;
 import com.example.tracker.LocationTrack;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,6 +26,15 @@ import java.util.TimerTask;
 public class LocalizationService extends Service {
     //TODO change it do handle db
     private List<LatLanHolder> locations= new LinkedList<>();
+    private FirebaseDataService database;
+    private long TRACK_ID=0;
+    private  long sampleCount=0;
+
+    public LocalizationService() {
+        this.database=new FirebaseDataService();
+        this.TRACK_ID=database.getTrackId();
+    }
+
 
     private Handler handler;
     private LocationTrack locationTrack;
@@ -109,7 +114,11 @@ public class LocalizationService extends Service {
                 latLast=locations.get(locations.size()-1).getLat();
             }
             if(validLocalization(latCurr,lanCurr,latLast,lanLast)){
-                locations.add(new LatLanHolder(latCurr,lanCurr));
+                LatLanHolder currentLocalization=new LatLanHolder(latCurr,lanCurr);
+                locations.add(currentLocalization);
+                //increase sample nr and add to db
+                ++sampleCount;
+                database.addLocationToCurrentTrack(sampleCount,TRACK_ID,currentLocalization);
                 TOTAL_DISTANCE+=LAST_DISTANCE;
             }
             //if there is only one point set distance to 0
