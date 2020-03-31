@@ -5,10 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Color;
+import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -16,6 +18,7 @@ import android.widget.Toast;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.FragmentActivity;
 
+import com.example.tracker.database.FirebaseDataService;
 import com.example.tracker.models.LatLanHolder;
 import com.example.tracker.services.LocalizationService;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -81,21 +84,6 @@ public class MapsActivity extends FragmentActivity
         mapFragment.getMapAsync(this);
 
         distanceView=findViewById(R.id.distanceView);
-        //locations.add(new LatLanHolder(LAST_CAPTURED_LATITUDE,LAST_CAPTURED_LONGITUDE));
-        //locations.add(new LatLanHolder(LAST_CAPTURED_LATITUDE+0.008,LAST_CAPTURED_LONGITUDE+0.004));
-
-//        handler=new Handler();
-//        //run fetching user localization every 10 sec
-//        handler.postDelayed(new Runnable() {
-//                @RequiresApi(api = Build.VERSION_CODES.N)
-//                @Override
-//                public void run() {
-//                    getLocation();
-//                    handler.postDelayed(this, delay);
-//                }
-//            }, delay);
-
-        //////////////////////////////////////////////
         //start Localization service and bind it
         Intent intent= new Intent(this,LocalizationService.class);
        // startService(intent);
@@ -162,13 +150,7 @@ public class MapsActivity extends FragmentActivity
     @Override
     protected void onResume() {
         super.onResume();
-//        if(ifLocationToAdd && mMap!=null){
-//            mMap.clear();
-//            onMapReady(mMap);
-//            refreshDistance();
-//            ifLocationToAdd=false;
-//        }
-        //if there  are locations to display
+
         if(mLocalizationService!=null && !mLocalizationService.getLocations().isEmpty()){
             //if something changed
             if(mLocalizationService.getLocations().size()>=locations.size()){
@@ -218,40 +200,13 @@ public class MapsActivity extends FragmentActivity
                 Toast.LENGTH_SHORT).show();
     }
 
-
-//    @RequiresApi(api = Build.VERSION_CODES.N)
-//    public void getLocation() {
-//        //create LocationTrack obj to get info
-//        //TODO check if LocationTrack can be singleton class
-//        locationTrack=new LocationTrack(this);
-//        if(locationTrack.canGetLocation()){
-//            //valid results
-//            //current values
-//            double lanCurr=locationTrack.getLongitude();
-//            double latCurr=locationTrack.getLatitude();
-//            double lanLast=locations.get(locations.size()-1).lan;
-//            double latLast=locations.get(locations.size()-1).lat;
-//            //if change of distance is grater than 10m add point
-//            double distance=DistanceCalculator.distance(latCurr,lanCurr,latLast,lanLast,"K");
-//            if(distance>VALID_DISTANCE_BETWEEN_SAMPLES){
-//                locations.add(new LatLanHolder(latCurr,lanCurr));
-//                ifLocationToAdd=true;
-//                TOTAL_DISTANCE+=distance;
-//                LAST_CAPTURED_LATITUDE=latCurr;
-//                LAST_CAPTURED_LONGITUDE=lanLast;
-//                onResume();
-//            }
-//
-//            Toast.makeText(this,"lat : "+locationTrack.getLatitude()+" \n lan: "+locationTrack.getLongitude(),Toast.LENGTH_SHORT).show();
-//        }
-//    }
-
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void getPosition(View view) {
         List<LatLanHolder> locationsInternal=mLocalizationService.getLocations();
         LatLanHolder holder=locationsInternal.get(locationsInternal.size()-1);
         locations=mLocalizationService.getLocations();
         Toast.makeText(this,LAST_CAPTURED_LATITUDE+" "+LAST_CAPTURED_LONGITUDE,Toast.LENGTH_LONG ).show();
+
     }
 
     @Override
@@ -267,5 +222,11 @@ public class MapsActivity extends FragmentActivity
         //String distanceSting=String.valueOf(TOTAL_DISTANCE);
         //distanceView.setText(distanceSting.substring(0,5));
         distanceView.setText(String.valueOf(mLocalizationService.getTotalDistance()));
+    }
+
+    public void goToDetails(View view) {
+
+        Intent intent=new Intent(this,TrackInfos.class);
+        startActivity(intent);
     }
 }

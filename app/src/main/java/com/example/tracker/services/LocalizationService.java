@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 
 public class LocalizationService extends Service {
     //TODO change it do handle db
@@ -31,8 +32,8 @@ public class LocalizationService extends Service {
     private  long sampleCount=0;
 
     public LocalizationService() {
-        this.database=new FirebaseDataService();
-        this.TRACK_ID=database.getTrackId();
+        this.database=FirebaseDataService.getInstance();
+        //if id has not been refreshed wait
     }
 
 
@@ -118,6 +119,7 @@ public class LocalizationService extends Service {
                 locations.add(currentLocalization);
                 //increase sample nr and add to db
                 ++sampleCount;
+                initTrackId();
                 database.addLocationToCurrentTrack(sampleCount,TRACK_ID,currentLocalization);
                 TOTAL_DISTANCE+=LAST_DISTANCE;
             }
@@ -129,6 +131,11 @@ public class LocalizationService extends Service {
         }
     }
 
+    private void initTrackId() {
+        if(TRACK_ID==0){
+            this.TRACK_ID=database.getTrackId();
+        }
+    }
     private boolean validLocalization(double latCurr, double lanCurr, double latLast, double lanLast){
         double distance= DistanceCalculator.distance(latCurr,lanCurr,latLast,lanLast,"K");
         if(distance > VALID_DISTANCE_BETWEEN_SAMPLES){

@@ -1,18 +1,34 @@
 package com.example.tracker.database;
 
+import android.os.Build;
+import android.util.Log;
+import android.widget.ArrayAdapter;
+
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 import com.example.tracker.models.LatLanHolder;
+import com.google.android.gms.tasks.TaskCompletionSource;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+import static android.content.ContentValues.TAG;
+
 public class FirebaseDataService {
 
+    //NOTE service acts like a bean (singleton)
     private DatabaseReference databaseReference;
     private long CURRENT_TRACK_ID=0;
+    public boolean ifTrackIdRefreshed=false;
 
     /**
      * DB STRUCTURE
@@ -28,23 +44,31 @@ public class FirebaseDataService {
 
     //TODO app is designated for single user so in order to handle more simultaneously
     // logged users there is need to add UserId to prevent overriding data between users
-    public FirebaseDataService() {
+
+    private static class SingletonHelper{
+        private static final FirebaseDataService INSTANCE=new FirebaseDataService();
+    }
+    public static FirebaseDataService getInstance(){return SingletonHelper.INSTANCE;}
+
+    private FirebaseDataService() {
         //tracks is first of node in db
         this.databaseReference= FirebaseDatabase.getInstance().getReference().child("TRACKS");
+
         //set value event listener
-        this.databaseReference.addValueEventListener(new ValueEventListener() {
+        ValueEventListener listener= new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()){
                     //set maxId to the last id of children
                     CURRENT_TRACK_ID=dataSnapshot.getChildrenCount();
+                    ifTrackIdRefreshed=true;
                 }
             }
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
-        });
-
+        };
+        databaseReference.addValueEventListener(listener);
     }
 
     public void addLocationToCurrentTrack(long sampleNr,long trackId,LatLanHolder location){
@@ -54,7 +78,75 @@ public class FirebaseDataService {
 
     //returns track id for particular track
     public long getTrackId(){
+        ifTrackIdRefreshed=false;
         return CURRENT_TRACK_ID+1;
     }
 
+//    public void getLocationForTrackSynchronized(long trackID,List<LatLanHolder> locations, ArrayAdapter<LatLanHolder> adapter){
+//
+//        DatabaseReference reference=FirebaseDatabase.getInstance().getReference()
+//                .child("TRACKS")
+//                .child(String.valueOf(trackID));
+//
+//        ChildEventListener childEventListener= new ChildEventListener() {
+//            @Override
+//            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//
+//                LatLanHolder holder=dataSnapshot.getValue(LatLanHolder.class);
+//                locations.add(holder);
+//                adapter.notifyDataSetChanged();
+//            }
+//            @Override
+//            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//            }
+//
+//            @Override
+//            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+//            }
+//
+//            @Override
+//            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//            }
+//        };
+//        reference.addChildEventListener(childEventListener);
+//    }
+
+    public List<String> getLocationTracks(ArrayAdapter<String> adapter,List<String> tracks){
+
+        DatabaseReference reference=FirebaseDatabase.getInstance().getReference()
+                .child("TRACKS");
+
+        //list of track ids
+
+
+        ChildEventListener childEventListener= new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                String trackId=dataSnapshot.getKey();
+                tracks.add(String.valueOf(trackId));
+                adapter.notifyDataSetChanged();
+            }
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        };
+        reference.addChildEventListener(childEventListener);
+        return tracks;
+    }
 }
