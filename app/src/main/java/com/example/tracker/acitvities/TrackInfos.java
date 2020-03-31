@@ -1,4 +1,4 @@
-package com.example.tracker;
+package com.example.tracker.acitvities;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,6 +16,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.tracker.R;
 import com.example.tracker.database.FirebaseDataService;
 import com.example.tracker.models.LatLanHolder;
 import com.google.android.gms.tasks.Task;
@@ -46,27 +47,6 @@ public class TrackInfos extends AppCompatActivity {
         getTrackIds();
     }
 
-//    @RequiresApi(api = Build.VERSION_CODES.N)
-//    private void getInfos()  {
-//
-//        StringBuilder builder=new StringBuilder();
-//
-//        ArrayList<LatLanHolder> locations=new ArrayList<>();
-//
-//        ArrayAdapter<LatLanHolder> adapter=new ArrayAdapter<>(this,android.R.layout.simple_list_item_1,locations);
-//        dataService.getLocationForTrackSynchronized(1,locations,adapter);
-//
-//        listView.setAdapter(adapter);
-//        builder.append("lokalizacje : \n");
-//        locations.forEach(location -> {
-//            builder.append(location.getLat())
-//                    .append("      ")
-//                    .append(location.getLan())
-//                    .append("\n");
-//        });
-//
-//
-//    }
     private void getTrackIds(){
         StringBuilder builder= new StringBuilder();
 

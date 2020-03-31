@@ -5,12 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Color;
-import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,9 +16,10 @@ import android.widget.Toast;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.FragmentActivity;
 
-import com.example.tracker.database.FirebaseDataService;
+import com.example.tracker.acitvities.TrackInfos;
 import com.example.tracker.models.LatLanHolder;
 import com.example.tracker.services.LocalizationService;
+import com.example.tracker.services.LocationTrack;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -226,7 +225,7 @@ public class MapsActivity extends FragmentActivity
 
     public void goToDetails(View view) {
 
-        Intent intent=new Intent(this,TrackInfos.class);
+        Intent intent=new Intent(this, TrackInfos.class);
         startActivity(intent);
     }
 }

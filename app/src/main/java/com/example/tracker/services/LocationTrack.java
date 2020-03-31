@@ -1,4 +1,4 @@
-package com.example.tracker;
+package com.example.tracker.services;
 
 import android.Manifest;
 import android.app.Activity;

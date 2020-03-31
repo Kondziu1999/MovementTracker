@@ -1,4 +1,4 @@
-package com.example.tracker;
+package com.example.tracker.services;
 
 public class DistanceCalculator
 {

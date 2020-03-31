@@ -9,11 +9,8 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
-import com.example.tracker.DistanceCalculator;
 import com.example.tracker.database.FirebaseDataService;
 import com.example.tracker.models.LatLanHolder;
-import com.example.tracker.LocationTrack;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -22,7 +19,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.stream.Collectors;
 
 public class LocalizationService extends Service {
     //TODO change it do handle db
