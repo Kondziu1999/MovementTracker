@@ -72,6 +72,7 @@ public class MapsActivity extends FragmentActivity
     private LocalizationService mLocalizationService;
     private boolean mBound;
     private Handler refreshHandler;
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {

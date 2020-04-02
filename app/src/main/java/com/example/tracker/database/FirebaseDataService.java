@@ -7,6 +7,7 @@ import android.widget.ArrayAdapter;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.databinding.ObservableList;
 
 import com.example.tracker.models.LatLanHolder;
 import com.google.android.gms.tasks.TaskCompletionSource;
@@ -82,39 +83,31 @@ public class FirebaseDataService {
         return CURRENT_TRACK_ID+1;
     }
 
-//    public void getLocationForTrackSynchronized(long trackID,List<LatLanHolder> locations, ArrayAdapter<LatLanHolder> adapter){
-//
-//        DatabaseReference reference=FirebaseDatabase.getInstance().getReference()
-//                .child("TRACKS")
-//                .child(String.valueOf(trackID));
-//
-//        ChildEventListener childEventListener= new ChildEventListener() {
-//            @Override
-//            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-//
-//                LatLanHolder holder=dataSnapshot.getValue(LatLanHolder.class);
-//                locations.add(holder);
-//                adapter.notifyDataSetChanged();
-//            }
-//            @Override
-//            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-//            }
-//
-//            @Override
-//            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-//            }
-//
-//            @Override
-//            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//            }
-//        };
-//        reference.addChildEventListener(childEventListener);
-//    }
+    public void  getLocationsForTrackId(String trackID, ObservableList<LatLanHolder> list){
 
+        DatabaseReference reference=FirebaseDatabase.getInstance().getReference().child("TRACKS").child(trackID);
+        ChildEventListener childEventListener=new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                LatLanHolder holder=dataSnapshot.getValue(LatLanHolder.class);
+                list.add(holder);
+            }
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            }
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+            }
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        };
+        reference.addChildEventListener(childEventListener);
+
+    }
     public List<String> getLocationTracks(ArrayAdapter<String> adapter,List<String> tracks){
 
         DatabaseReference reference=FirebaseDatabase.getInstance().getReference()

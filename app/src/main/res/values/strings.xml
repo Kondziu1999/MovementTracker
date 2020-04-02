@@ -6,4 +6,5 @@
     <string name="get_position">get Position</string>
     <string name="distanceViewText">distance ...</string>
     <string name="title_activity_show_track">Map</string>
+    <string name="TRACK_ID">TrackID</string>
 </resources>

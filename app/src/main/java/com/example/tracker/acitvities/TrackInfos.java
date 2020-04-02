@@ -62,7 +62,11 @@ public class TrackInfos extends AppCompatActivity {
 
                 Toast.makeText(context,"selected track: "+selectedItem,Toast.LENGTH_LONG).show();
 
-                //Intent intent=new Intent(context,)
+                //show all track on separate map
+                //pass TrackId via intent's extra
+                Intent intent=new Intent(context,ShowTrackActivity.class);
+                intent.putExtra(getString(R.string.TRACK_ID),trackIds.get(position));
+                startActivity(intent);
             }
         });
 
