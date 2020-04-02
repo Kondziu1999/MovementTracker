@@ -47,7 +47,7 @@ public class MapsActivity extends FragmentActivity
 {
     private static final int COLOR_RED_ARGB=0xff6550;
     private static final int COLOR_BLACK_ARGB = 0xff000000;
-    private static final int POLYLINE_STROKE_WIDTH_PX = 3;
+    private static final int POLYLINE_STROKE_WIDTH_PX = 7;
     private static final int PATTERN_DASH_LENGTH_PX = 2;
     private static final int PATTERN_GAP_LENGTH_PX = 2;
     private static final PatternItem DOT = new Dot();
@@ -101,7 +101,7 @@ public class MapsActivity extends FragmentActivity
             @Override
             public void run() {
                 onResume();
-                refreshHandler.postDelayed(this, timeout);
+                refreshHandler.postDelayed(this, 4000);
             }
         }, timeout);
     }

@@ -35,6 +35,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
+import java.util.Random;
 
 public class ShowTrackActivity extends FragmentActivity implements
         OnMapReadyCallback,
@@ -43,7 +44,7 @@ public class ShowTrackActivity extends FragmentActivity implements
 
 {
     //syf do modelowania
-    private static final int POLYLINE_STROKE_WIDTH_PX = 3;
+    private static final int POLYLINE_STROKE_WIDTH_PX = 8;
     private static final int PATTERN_DASH_LENGTH_PX = 2;
     private static final int PATTERN_GAP_LENGTH_PX = 2;
     private static final PatternItem DOT = new Dot();
@@ -60,7 +61,13 @@ public class ShowTrackActivity extends FragmentActivity implements
     private FirebaseDataService dataService;
     private Context context;
     private List<String> TRACK_IDS=new ArrayList<>();
+    private List<List<LatLanHolder>> TRACKS_TO_PLOT=new ArrayList<>();
+    private Integer TRACKS_TO_PLOT_COUNT=0;
+    //color to style polyline
+    public int color=Color.rgb(255,0,0);
+    private int colorCount=0;
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +76,7 @@ public class ShowTrackActivity extends FragmentActivity implements
         //SINGLE TRACK obtain track Id
         if(getIntent().hasExtra(getString(R.string.TRACK_ID))){
             trackId=getIntent().getStringExtra(getString(R.string.TRACK_ID));
+            TRACK_IDS.add(trackId);
         }
         //MULTIPLE TRACK
         if(getIntent().hasExtra(getString(R.string.MULTIPLE_TRACK_ID))){
@@ -86,16 +94,17 @@ public class ShowTrackActivity extends FragmentActivity implements
         //setAppContext
         //TODO consider changing it
         context=getApplicationContext();
-        getTrackLocations(trackId);
+        getMultipleTracksLocations();
     }
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        PolylineOptions polylineOptions=new PolylineOptions()
-                .clickable(true);
         //add points to polyline
-        locations
+        TRACKS_TO_PLOT.forEach(track->{
+            PolylineOptions polylineOptions=new PolylineOptions()
+                    .clickable(true);
+            track
                 .forEach(location-> {
                     LatLng position=new LatLng(location.getLat(),location.getLan());
                     polylineOptions.add(position);
@@ -105,8 +114,8 @@ public class ShowTrackActivity extends FragmentActivity implements
                 });
         polyline=googleMap.addPolyline(polylineOptions);
         polyline.setTag("A");
-        // Style the polyline.
         stylePolyline(polyline);
+        });
         //move camera to last position of user
         //TODO change setting camera view to capture whole points area
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(LAST_CAPTURED_LATITUDE,LAST_CAPTURED_LONGITUDE),15));
@@ -132,7 +141,8 @@ public class ShowTrackActivity extends FragmentActivity implements
         polyline.setEndCap(new RoundCap());
         polyline.setJointType(JointType.BEVEL);
         polyline.setWidth(POLYLINE_STROKE_WIDTH_PX);
-        polyline.setColor(Color.RED);
+        polyline.setColor(getRandomColor());
+
         polyline.setJointType(JointType.ROUND);
     }
 
@@ -141,8 +151,15 @@ public class ShowTrackActivity extends FragmentActivity implements
     protected void onResume() {
         super.onResume();
         if(mMap!=null){
-            LAST_CAPTURED_LATITUDE=locations.get(locations.size()-1).getLat();
-            LAST_CAPTURED_LONGITUDE=locations.get(locations.size()-1).getLan();
+//            LAST_CAPTURED_LATITUDE=locations.get(locations.size()-1).getLat();
+//            LAST_CAPTURED_LONGITUDE=locations.get(locations.size()-1).getLan();
+            //get last plot
+            List<LatLanHolder> holder=TRACKS_TO_PLOT.get(TRACKS_TO_PLOT.size()-1);
+            if(holder.size()>0){
+                LAST_CAPTURED_LATITUDE=holder.get(holder.size()-1).getLat();
+                LAST_CAPTURED_LONGITUDE=holder.get(holder.size()-1).getLan();
+            }
+            mMap.clear();
             onMapReady(mMap);
         }
     }
@@ -151,11 +168,16 @@ public class ShowTrackActivity extends FragmentActivity implements
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void getMultipleTracksLocations(){
         //create List of list locations
-        TRACK_IDS.forEach(this::getTrackLocations);
+
+        TRACK_IDS.forEach(trackId1 -> getTrackLocations(trackId1,TRACKS_TO_PLOT_COUNT));
 
     }
     //single Track plot
-    private void getTrackLocations(String trackId){
+    private void getTrackLocations(String trackId,int PlotNr){
+        List<LatLanHolder> locationsForTrack= new ArrayList<>();
+        TRACKS_TO_PLOT.add(locationsForTrack);
+        TRACKS_TO_PLOT_COUNT++;
+
         ObservableList<LatLanHolder> observableList=new ObservableArrayList<>();
         dataService.getLocationsForTrackId(trackId,observableList);
         observableList.addOnListChangedCallback(new ObservableList.OnListChangedCallback<ObservableList<LatLanHolder>>() {
@@ -169,7 +191,8 @@ public class ShowTrackActivity extends FragmentActivity implements
             @Override
             public void onItemRangeInserted(ObservableList<LatLanHolder> sender, int positionStart, int itemCount) {
                 for (int i=positionStart; i<sender.size(); i++){
-                    locations.add(sender.get(i));
+                   // locations.add(sender.get(i));
+                    locationsForTrack.add(sender.get(i));
                 }
                 onResume();
             }
@@ -199,6 +222,18 @@ public class ShowTrackActivity extends FragmentActivity implements
         }
         Toast.makeText(this, "Route type " + polyline.getTag().toString(),
                 Toast.LENGTH_SHORT).show();
+    }
+
+    private int getRandomColor(){
+
+        Integer [] xd={Color.RED,Color.BLACK,Color.YELLOW,Color.GREEN,
+                Color.rgb(255,0,255),Color.BLUE,Color.rgb(0,255,255)};
+        if(colorCount>xd.length-1) {
+            colorCount = 0;
+        }
+
+        return xd[colorCount++];
+
     }
 
 }
