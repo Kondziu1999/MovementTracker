@@ -114,32 +114,44 @@ public class FirebaseDataService {
                 .child("TRACKS");
 
         //list of track ids
-
-
-        ChildEventListener childEventListener= new ChildEventListener() {
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                String trackId=dataSnapshot.getKey();
-                tracks.add(String.valueOf(trackId));
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot postSnapshot:dataSnapshot.getChildren()){
+                    String trackId=postSnapshot.getKey();
+                    tracks.add(String.valueOf(trackId));
+                }
                 adapter.notifyDataSetChanged();
             }
             @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-            }
-
-            @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
-        };
-        reference.addChildEventListener(childEventListener);
+        });
+
+//        ChildEventListener childEventListener= new ChildEventListener() {
+//            @Override
+//            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//                String trackId=dataSnapshot.getKey();
+//                tracks.add(String.valueOf(trackId));
+//                adapter.notifyDataSetChanged();
+//            }
+//            @Override
+//            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//            }
+//
+//            @Override
+//            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+//            }
+//
+//            @Override
+//            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//            }
+//        };
+//        reference.addChildEventListener(childEventListener);
         return tracks;
     }
 }

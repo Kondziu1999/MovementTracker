@@ -30,6 +30,7 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.RoundCap;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -58,14 +59,23 @@ public class ShowTrackActivity extends FragmentActivity implements
     private String trackId;
     private FirebaseDataService dataService;
     private Context context;
+    private List<String> TRACK_IDS=new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_track);
-        //obtain track Id
+
+        //SINGLE TRACK obtain track Id
         if(getIntent().hasExtra(getString(R.string.TRACK_ID))){
             trackId=getIntent().getStringExtra(getString(R.string.TRACK_ID));
+        }
+        //MULTIPLE TRACK
+        if(getIntent().hasExtra(getString(R.string.MULTIPLE_TRACK_ID))){
+            Bundle bundle=this.getIntent().getExtras();
+            if(bundle!=null){
+                TRACK_IDS=bundle.getStringArrayList(getString(R.string.MULTIPLE_TRACK_ID));
+            }
         }
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -76,7 +86,7 @@ public class ShowTrackActivity extends FragmentActivity implements
         //setAppContext
         //TODO consider changing it
         context=getApplicationContext();
-        getTrackLocations();
+        getTrackLocations(trackId);
     }
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -137,7 +147,15 @@ public class ShowTrackActivity extends FragmentActivity implements
         }
     }
 
-    private void getTrackLocations(){
+    //if there is multiple TrackLocations to plot
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void getMultipleTracksLocations(){
+        //create List of list locations
+        TRACK_IDS.forEach(this::getTrackLocations);
+
+    }
+    //single Track plot
+    private void getTrackLocations(String trackId){
         ObservableList<LatLanHolder> observableList=new ObservableArrayList<>();
         dataService.getLocationsForTrackId(trackId,observableList);
         observableList.addOnListChangedCallback(new ObservableList.OnListChangedCallback<ObservableList<LatLanHolder>>() {

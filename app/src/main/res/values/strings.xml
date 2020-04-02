@@ -7,4 +7,5 @@
     <string name="distanceViewText">distance ...</string>
     <string name="title_activity_show_track">Map</string>
     <string name="TRACK_ID">TrackID</string>
+    <string name="MULTIPLE_TRACK_ID">Multiple Track Id</string>
 </resources>
