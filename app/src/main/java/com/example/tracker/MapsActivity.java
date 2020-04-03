@@ -14,6 +14,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
+
+import androidx.appcompat.widget.Toolbar;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
 
@@ -86,7 +89,6 @@ public class MapsActivity extends FragmentActivity
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
         distanceView=findViewById(R.id.distanceView);
         //start Localization service and bind it
         Intent intent= new Intent(this,LocalizationService.class);
@@ -105,7 +107,7 @@ public class MapsActivity extends FragmentActivity
             @Override
             public void run() {
                 onResume();
-                refreshHandler.postDelayed(this, 4000);
+                refreshHandler.postDelayed(this, 2000);
             }
         }, timeout);
     }
@@ -143,8 +145,9 @@ public class MapsActivity extends FragmentActivity
         polyline.setTag("A");
         // Style the polyline.
         stylePolyline(polyline);
-        //move camera to center of markers
-        googleMap.moveCamera(DistanceCalculator.setCenter(markers));
+        //move camera to center of markers when map will initialize
+        googleMap.setOnMapLoadedCallback(() ->googleMap.moveCamera(DistanceCalculator.setCenter(markers)));
+
         googleMap.setOnPolylineClickListener(this);
         googleMap.setOnMarkerClickListener(this);
     }
@@ -206,9 +209,9 @@ public class MapsActivity extends FragmentActivity
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void getPosition(View view) {
-        List<LatLanHolder> locationsInternal=mLocalizationService.getLocations();
-        LatLanHolder holder=locationsInternal.get(locationsInternal.size()-1);
-        locations=mLocalizationService.getLocations();
+//        List<LatLanHolder> locationsInternal=mLocalizationService.getLocations();
+//        LatLanHolder holder=locationsInternal.get(locationsInternal.size()-1);
+//        locations=mLocalizationService.getLocations();
         Toast.makeText(this,LAST_CAPTURED_LATITUDE+" "+LAST_CAPTURED_LONGITUDE,Toast.LENGTH_LONG ).show();
 
     }

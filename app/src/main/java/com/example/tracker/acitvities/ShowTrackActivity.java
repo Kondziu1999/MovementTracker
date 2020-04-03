@@ -119,8 +119,9 @@ public class ShowTrackActivity extends FragmentActivity implements
         polyline.setTag("A");
         stylePolyline(polyline);
         });
-        //move camera to center of markers
-        googleMap.moveCamera(DistanceCalculator.setCenter(markers));
+        //move camera to center of markers when map will initialize
+        googleMap.setOnMapLoadedCallback(() -> googleMap.moveCamera(DistanceCalculator.setCenter(markers)));
+
         googleMap.setOnPolylineClickListener(this);
         googleMap.setOnMarkerClickListener(this);
     }
