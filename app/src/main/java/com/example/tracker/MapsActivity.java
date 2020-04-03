@@ -14,10 +14,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
 
 import com.example.tracker.acitvities.TrackInfos;
 import com.example.tracker.models.LatLanHolder;
+import com.example.tracker.services.DistanceCalculator;
 import com.example.tracker.services.LocalizationService;
 import com.example.tracker.services.LocationTrack;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -36,6 +38,7 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.RoundCap;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -72,6 +75,7 @@ public class MapsActivity extends FragmentActivity
     private LocalizationService mLocalizationService;
     private boolean mBound;
     private Handler refreshHandler;
+    private List<Marker> markers=new ArrayList<>(20);
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -130,17 +134,17 @@ public class MapsActivity extends FragmentActivity
                 .forEach(location-> {
                     LatLng position=new LatLng(location.getLat(),location.getLan());
                     polylineOptions.add(position);
-                    mMap.addMarker(
+                    Marker marker=mMap.addMarker(
                             new MarkerOptions().position(position).title("extra point :) \n lat: "+position.latitude+" \n lon :"+position.longitude)
                     );
+                    markers.add(marker);
                 });
         polyline=googleMap.addPolyline(polylineOptions);
         polyline.setTag("A");
         // Style the polyline.
         stylePolyline(polyline);
-        //move camera to last position of user
-        //TODO change setting camera view to capture whole points area
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(LAST_CAPTURED_LATITUDE, LAST_CAPTURED_LONGITUDE),20));
+        //move camera to center of markers
+        googleMap.moveCamera(DistanceCalculator.setCenter(markers));
         googleMap.setOnPolylineClickListener(this);
         googleMap.setOnMarkerClickListener(this);
     }

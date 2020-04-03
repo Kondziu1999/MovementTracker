@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.example.tracker.R;
 import com.example.tracker.database.FirebaseDataService;
 import com.example.tracker.models.LatLanHolder;
+import com.example.tracker.services.DistanceCalculator;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -66,6 +67,7 @@ public class ShowTrackActivity extends FragmentActivity implements
     //color to style polyline
     public int color=Color.rgb(255,0,0);
     private int colorCount=0;
+    private List<Marker> markers=new ArrayList<>(20);
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -108,17 +110,17 @@ public class ShowTrackActivity extends FragmentActivity implements
                 .forEach(location-> {
                     LatLng position=new LatLng(location.getLat(),location.getLan());
                     polylineOptions.add(position);
-                    mMap.addMarker(
+                    Marker marker=mMap.addMarker(
                             new MarkerOptions().position(position).title("extra point :) \n lat: "+position.latitude+" \n lon :"+position.longitude)
                     );
+                    markers.add(marker);
                 });
         polyline=googleMap.addPolyline(polylineOptions);
         polyline.setTag("A");
         stylePolyline(polyline);
         });
-        //move camera to last position of user
-        //TODO change setting camera view to capture whole points area
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(LAST_CAPTURED_LATITUDE,LAST_CAPTURED_LONGITUDE),15));
+        //move camera to center of markers
+        googleMap.moveCamera(DistanceCalculator.setCenter(markers));
         googleMap.setOnPolylineClickListener(this);
         googleMap.setOnMarkerClickListener(this);
     }
