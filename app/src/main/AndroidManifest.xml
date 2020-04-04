@@ -36,7 +36,7 @@
         <activity
             android:name=".acitvities.ShowTrackActivity"
             android:label="@string/title_activity_show_track"
-         />
+        />
         <activity android:name=".acitvities.TrackInfos"
                  />
         <activity

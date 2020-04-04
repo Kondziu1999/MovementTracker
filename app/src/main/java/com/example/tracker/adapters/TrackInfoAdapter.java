@@ -36,7 +36,6 @@ public class TrackInfoAdapter extends ArrayAdapter<String> {
         ifTrackSelected=new ArrayList<>();
     }
 
-
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -86,5 +85,13 @@ public class TrackInfoAdapter extends ArrayAdapter<String> {
         });
 
         return row;
+    }
+
+    public List<Boolean> getIfTrackSelected() {
+        return ifTrackSelected;
+    }
+
+    public void setIfTrackSelected(List<Boolean> ifTrackSelected) {
+        this.ifTrackSelected = ifTrackSelected;
     }
 }

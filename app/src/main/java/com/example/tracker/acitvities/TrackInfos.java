@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.ActionMode;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -52,7 +53,6 @@ public class TrackInfos extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_track_infos);
 
-
         tracksSelections=new ArrayList<>(20);
         trackIds= new ArrayList<>(20);
         listView=(ListView)findViewById(R.id.trackLocations);
@@ -62,29 +62,9 @@ public class TrackInfos extends AppCompatActivity {
         getTracksList();
     }
 
-//    private void getTrackIds(){
-//        ArrayAdapter<String> adapter=new ArrayAdapter<>(this,android.R.layout.simple_list_item_1,trackIds);
-//        dataService.getLocationTracks(adapter,trackIds);
-//
-//        listView.setAdapter(adapter);
-//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                String selectedItem=(String) parent.getItemAtPosition(position);
-//
-//                Toast.makeText(context,"selected track: "+selectedItem,Toast.LENGTH_LONG).show();
-//
-//                //show all track on separate map
-//                //pass TrackId via intent's extra
-//                Intent intent=new Intent(context,ShowTrackActivity.class);
-//                intent.putExtra(getString(R.string.TRACK_ID),trackIds.get(position));
-//                startActivity(intent);
-//            }
-//        });
-//    }
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void getTracksList(){
-        TrackInfoAdapter adapter=new TrackInfoAdapter(this,trackIds);
+        adapter=new TrackInfoAdapter(this,trackIds);
         dataService.getLocationTracks(adapter,trackIds);
 
         listView.setAdapter(adapter);
@@ -112,14 +92,6 @@ public class TrackInfos extends AppCompatActivity {
     AbsListView.MultiChoiceModeListener modeListener=new AbsListView.MultiChoiceModeListener() {
         @Override
         public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-            //if selected track is on the list remove otherwise add to selection
-//            if(tracksSelections.contains(trackIds.get(position))){
-//                tracksSelections.remove(trackIds.get(position));
-//            }
-//            else{
-//                tracksSelections.add(trackIds.get(position));
-//            }
-//            mode.setTitle(tracksSelections.size()+"  tracks selected...");
         }
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -142,20 +114,19 @@ public class TrackInfos extends AppCompatActivity {
 
                 default:
                     return false;
-
             }
         }
+        @RequiresApi(api = Build.VERSION_CODES.N)
         @Override
         public void onDestroyActionMode(ActionMode mode) {
             ifActionMode=false;
             actionMode=null;
             tracksSelections.clear();
+            clearCheckboxes();
         }
     };
 
     private void compareTracks(){
-//        String[] selections=new String[tracksSelections.size()];
-//        tracksSelections.toArray(selections);
         Bundle bundle=new Bundle();
         bundle.putStringArrayList(getString(R.string.MULTIPLE_TRACK_ID), (ArrayList<String>) tracksSelections);
         Intent intent=new Intent(context,ShowTrackActivity.class);
@@ -163,4 +134,15 @@ public class TrackInfos extends AppCompatActivity {
 
         startActivity(intent);
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void clearCheckboxes(){
+        if(adapter!=null){
+            //change selected ary to false
+            for(int i=0; i<adapter.getIfTrackSelected().size(); i++){
+                adapter.getIfTrackSelected().set(i,false);
+            }
+        }
+    }
+
 }

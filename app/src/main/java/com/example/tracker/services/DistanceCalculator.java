@@ -43,7 +43,7 @@ public class DistanceCalculator
         LatLngBounds.Builder builder=new LatLngBounds.Builder();
 
         markers.forEach(marker -> builder.include(marker.getPosition()));
-        int padding=0;
+        int padding=4;
         LatLngBounds bounds=builder.build();
         CameraUpdate cameraUpdate= CameraUpdateFactory.newLatLngBounds(bounds,padding);
         return cameraUpdate;

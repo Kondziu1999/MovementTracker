@@ -67,7 +67,6 @@ public class ShowTrackActivity extends FragmentActivity implements
     private List<List<LatLanHolder>> TRACKS_TO_PLOT=new ArrayList<>();
     private Integer TRACKS_TO_PLOT_COUNT=0;
     //color to style polyline
-    public int color=Color.rgb(255,0,0);
     private int colorCount=0;
     private List<Marker> markers=new ArrayList<>(20);
 
@@ -105,6 +104,7 @@ public class ShowTrackActivity extends FragmentActivity implements
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         //add points to polyline
+        //TODO consider abstract it to another method for visibility
         TRACKS_TO_PLOT.forEach(track->{
             PolylineOptions polylineOptions=new PolylineOptions()
                     .clickable(true);
@@ -144,6 +144,7 @@ public class ShowTrackActivity extends FragmentActivity implements
 
                 break;
         }
+        polyline.setPattern(PATTERN_POLYLINE_DOTTED);
         polyline.setEndCap(new CustomCap(BitmapDescriptorFactory.fromResource(R.drawable.ic_arrow),16));
         polyline.setJointType(JointType.BEVEL);
         polyline.setWidth(POLYLINE_STROKE_WIDTH_PX);
@@ -157,8 +158,6 @@ public class ShowTrackActivity extends FragmentActivity implements
     protected void onResume() {
         super.onResume();
         if(mMap!=null){
-//            LAST_CAPTURED_LATITUDE=locations.get(locations.size()-1).getLat();
-//            LAST_CAPTURED_LONGITUDE=locations.get(locations.size()-1).getLan();
             //get last plot
             List<LatLanHolder> holder=TRACKS_TO_PLOT.get(TRACKS_TO_PLOT.size()-1);
             if(holder.size()>0){
@@ -174,9 +173,7 @@ public class ShowTrackActivity extends FragmentActivity implements
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void getMultipleTracksLocations(){
         //create List of list locations
-
         TRACK_IDS.forEach(trackId1 -> getTrackLocations(trackId1,TRACKS_TO_PLOT_COUNT));
-
     }
     //single Track plot
     private void getTrackLocations(String trackId,int PlotNr){
@@ -231,7 +228,6 @@ public class ShowTrackActivity extends FragmentActivity implements
     }
 
     private int getRandomColor(){
-
         Integer [] xd={Color.RED,Color.BLACK,Color.YELLOW,Color.GREEN,
                 Color.rgb(255,0,255),Color.BLUE,Color.rgb(0,255,255)};
         if(colorCount>xd.length-1) {
@@ -239,7 +235,6 @@ public class ShowTrackActivity extends FragmentActivity implements
         }
 
         return xd[colorCount++];
-
     }
 
 }
