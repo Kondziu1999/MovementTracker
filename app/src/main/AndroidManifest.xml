@@ -36,7 +36,7 @@
         <activity
             android:name=".acitvities.ShowTrackActivity"
             android:label="@string/title_activity_show_track"
-            android:noHistory="true" />
+         />
         <activity android:name=".acitvities.TrackInfos"
                  />
         <activity
@@ -44,6 +44,7 @@
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:label="@string/title_activity_maps"
             android:theme="@style/AppTheme.NoActionBar"
+
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

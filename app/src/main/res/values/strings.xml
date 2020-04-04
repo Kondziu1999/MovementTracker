@@ -8,4 +8,10 @@
     <string name="title_activity_show_track">Map</string>
     <string name="TRACK_ID">TrackID</string>
     <string name="MULTIPLE_TRACK_ID">Multiple Track Id</string>
+
+    <string name="OPEN">open</string>
+    <string name="CLOSE">close</string>
+
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
 </resources>

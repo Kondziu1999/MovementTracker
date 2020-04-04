@@ -19,6 +19,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CustomCap;
 import com.google.android.gms.maps.model.Dash;
 import com.google.android.gms.maps.model.Dot;
 import com.google.android.gms.maps.model.Gap;
@@ -139,9 +141,10 @@ public class ShowTrackActivity extends FragmentActivity implements
                 break;
             default:
                 polyline.setStartCap(new RoundCap());
+
                 break;
         }
-        polyline.setEndCap(new RoundCap());
+        polyline.setEndCap(new CustomCap(BitmapDescriptorFactory.fromResource(R.drawable.ic_arrow),16));
         polyline.setJointType(JointType.BEVEL);
         polyline.setWidth(POLYLINE_STROKE_WIDTH_PX);
         polyline.setColor(getRandomColor());

@@ -9,16 +9,26 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
+
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 
 import com.example.tracker.acitvities.TrackInfos;
 import com.example.tracker.models.LatLanHolder;
@@ -29,6 +39,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CustomCap;
 import com.google.android.gms.maps.model.Dash;
 import com.google.android.gms.maps.model.Dot;
 import com.google.android.gms.maps.model.Gap;
@@ -40,35 +52,32 @@ import com.google.android.gms.maps.model.PatternItem;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.RoundCap;
+import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
-public class MapsActivity extends FragmentActivity
+public class MapsActivity extends AppCompatActivity
         implements OnMapReadyCallback,
         GoogleMap.OnPolylineClickListener,
         GoogleMap.OnMarkerClickListener
 {
-    private static final int COLOR_RED_ARGB=0xff6550;
-    private static final int COLOR_BLACK_ARGB = 0xff000000;
+
     private static final int POLYLINE_STROKE_WIDTH_PX = 7;
     private static final int PATTERN_DASH_LENGTH_PX = 2;
     private static final int PATTERN_GAP_LENGTH_PX = 2;
     private static final PatternItem DOT = new Dot();
     private static final PatternItem DASH = new Dash(PATTERN_DASH_LENGTH_PX);
     private static final PatternItem GAP = new Gap(PATTERN_GAP_LENGTH_PX);
-    private static final double VALID_DISTANCE_BETWEEN_SAMPLES=0.007; //7m
-    // Create a stroke pattern of a gap followed by a dot.
     private static final List<PatternItem> PATTERN_POLYLINE_DOTTED = Arrays.asList(GAP, DOT);
 
     private GoogleMap mMap;
-    private static boolean ifLocationToAdd=false;
     private Polyline polyline;
-    private LocationTrack locationTrack;
 
-    private Handler handler;
+
     int DELAY=10000;
     double LAST_CAPTURED_LONGITUDE=20.760;
     double LAST_CAPTURED_LATITUDE= 50.840;
@@ -80,11 +89,31 @@ public class MapsActivity extends FragmentActivity
     private Handler refreshHandler;
     private List<Marker> markers=new ArrayList<>(20);
 
+    private DrawerLayout mDrawer;
+    private Toolbar toolbar;
+    private NavigationView nvDrawer;
+    private ActionBarDrawerToggle toggle;
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        //navigation drawer (side menu)
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        toggle=new ActionBarDrawerToggle(this,mDrawer,toolbar,R.string.OPEN,R.string.CLOSE);
+        toggle.setDrawerIndicatorEnabled(true);
+        toggle.syncState();
+        mDrawer.addDrawerListener(toggle);
+
+        nvDrawer = (NavigationView) findViewById(R.id.nvView);
+        nvDrawer.inflateHeaderView(R.layout.nav_header);
+        // Setup drawer view
+        setNavigationViewListener(nvDrawer);
+
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -95,9 +124,27 @@ public class MapsActivity extends FragmentActivity
        // startService(intent);
         startForegroundService(intent);
         bindService(intent,connection, Context.BIND_AUTO_CREATE);
-        ////////////////////////////////
+
         setRefreshLocalizationTimeout(DELAY);
 
+    }
+
+    private void setNavigationViewListener(NavigationView nv){
+        nv.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int id = item.getItemId();
+                switch(id)
+                {
+                    case R.id.show_tracks_icon:
+                        startTrackInfos();
+                        break;
+                    default:
+                        return true;
+                }
+                return true;
+            }
+        });
     }
 
     private void setRefreshLocalizationTimeout(long timeout){
@@ -182,6 +229,7 @@ public class MapsActivity extends FragmentActivity
             case "A":
                 // Use a custom bitmap as the cap at the start of the line.
                 polyline.setStartCap(new RoundCap());
+                polyline.setEndCap(new CustomCap(BitmapDescriptorFactory.fromResource(R.drawable.ic_arrow),16));
                 break;
             case "B":
                 // Use a round cap at the start of the line.
@@ -232,8 +280,24 @@ public class MapsActivity extends FragmentActivity
     }
 
     public void goToDetails(View view) {
-
         Intent intent=new Intent(this, TrackInfos.class);
         startActivity(intent);
+    }
+
+    private void startTrackInfos(){
+        Intent intent=new Intent(this, TrackInfos.class);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onBackPressed() {
+        //collapse side bar if back pressed
+        if(this.mDrawer.isDrawerOpen(GravityCompat.START)){
+            this.mDrawer.closeDrawer(GravityCompat.START);
+        }
+        //if there is no side bar minimize app
+        else {
+            this.moveTaskToBack(true);
+        }
     }
 }
