@@ -17,6 +17,7 @@ import java.util.List;
 public class DistanceCalculator
 {
     public static double distance(double lat1, double lon1, double lat2, double lon2, String unit) {
+        //second condition is here for check if
         if ((lat1 == lat2) && (lon1 == lon2)) {
             return 0;
         }

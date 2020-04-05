@@ -26,6 +26,7 @@ import com.example.tracker.R;
 import com.example.tracker.adapters.TrackInfoAdapter;
 import com.example.tracker.database.FirebaseDataService;
 import com.example.tracker.models.LatLanHolder;
+import com.example.tracker.models.TrackDetails;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.android.gms.tasks.Tasks;
@@ -33,6 +34,7 @@ import com.google.android.gms.tasks.Tasks;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 public class TrackInfos extends AppCompatActivity {
@@ -46,6 +48,7 @@ public class TrackInfos extends AppCompatActivity {
     public static List<String> tracksSelections;
     public static ActionMode actionMode;
     public static boolean ifActionMode=false;
+    public static Map<String, TrackDetails> trackDetailsMap;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -65,9 +68,13 @@ public class TrackInfos extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void getTracksList(){
         adapter=new TrackInfoAdapter(this,trackIds);
-        dataService.getLocationTracks(adapter,trackIds);
+        //pass adapter in order to function can notify when data arrive form db
+        trackDetailsMap=dataService.getTrackDetails(adapter);
 
+        //get track IDS from db and put into passed List
+        dataService.getLocationTracks(adapter,trackIds);
         listView.setAdapter(adapter);
+
         //to allow multiChoice (checkboxes)
         //mode listener below
         listView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);

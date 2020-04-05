@@ -19,6 +19,7 @@ import androidx.annotation.RequiresApi;
 import com.example.tracker.R;
 import com.example.tracker.acitvities.TrackInfos;
 import com.example.tracker.models.LatLanHolder;
+import com.example.tracker.models.TrackDetails;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,7 @@ public class TrackInfoAdapter extends ArrayAdapter<String> {
     private List<String> tracks;
     private List<Boolean> ifTrackSelected;
     private Context context;
+    private static TrackDetails defaultDetails=new TrackDetails("no date specified",0.0);
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public TrackInfoAdapter(@NonNull Context context, List<String> tracks) {
@@ -36,6 +38,7 @@ public class TrackInfoAdapter extends ArrayAdapter<String> {
         ifTrackSelected=new ArrayList<>();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -60,7 +63,9 @@ public class TrackInfoAdapter extends ArrayAdapter<String> {
             checkBox.setVisibility(View.INVISIBLE);
         }
 
-        track.setText(tracks.get(position));
+
+        //track.setText(tracks.get(position));
+        track.setText(prepareText(tracks.get(position)));
         checkBox.setChecked(ifTrackSelected.get(position));
         checkBox.setTag(position);
         checkBox.setOnClickListener(new View.OnClickListener() {
@@ -93,5 +98,23 @@ public class TrackInfoAdapter extends ArrayAdapter<String> {
 
     public void setIfTrackSelected(List<Boolean> ifTrackSelected) {
         this.ifTrackSelected = ifTrackSelected;
+    }
+
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private String prepareText(String trackId){
+        StringBuilder builder=new StringBuilder();
+        builder.append("ID:  ")
+                .append(trackId);
+        if(TrackInfos.trackDetailsMap!=null){
+            TrackDetails details=TrackInfos.trackDetailsMap.getOrDefault(trackId,defaultDetails);
+            builder.append("    ")
+                    .append(details.getDate())
+                    .append("    ")
+                    .append(details.getDistance())
+                    .append(" km");
+        }
+
+        return builder.toString();
     }
 }

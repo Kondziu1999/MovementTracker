@@ -15,6 +15,7 @@ import com.example.tracker.models.LatLanHolder;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Timer;
@@ -55,7 +56,7 @@ public class LocalizationService extends Service {
     public double getTotalDistance(){
         return round(TOTAL_DISTANCE,3);
     }
-    public double round(double value, int places) {
+    public static double round(double value, int places) {
         if (places < 0) throw new IllegalArgumentException();
         BigDecimal bd = BigDecimal.valueOf(value);
         bd = bd.setScale(places, RoundingMode.HALF_UP);
@@ -118,6 +119,9 @@ public class LocalizationService extends Service {
                 initTrackId();
                 database.addLocationToCurrentTrack(sampleCount,TRACK_ID,currentLocalization);
                 TOTAL_DISTANCE+=LAST_DISTANCE;
+                //update total distance in db
+                database.setDistanceForTrack(String.valueOf(TRACK_ID),TOTAL_DISTANCE);
+
             }
             //if there is only one point set distance to 0
             if(locations.size()==1){
@@ -130,11 +134,18 @@ public class LocalizationService extends Service {
     private void initTrackId() {
         if(TRACK_ID==0){
             this.TRACK_ID=database.getTrackId();
+            //initialize date for Track ID in firebase
+            database.setDateForTrack(String.valueOf(this.TRACK_ID),new Date());
         }
     }
     private boolean validLocalization(double latCurr, double lanCurr, double latLast, double lanLast){
         double distance= DistanceCalculator.distance(latCurr,lanCurr,latLast,lanLast,"K");
         if(distance > VALID_DISTANCE_BETWEEN_SAMPLES){
+            //according to logic of app it means if there is a singe marker on map (star points are 0.0 ,0.0 )
+            if(latLast==0.0 && lanLast == 0.0){
+                LAST_DISTANCE=0;
+                return true;
+            }
             LAST_DISTANCE=distance;
             return true;
         }
