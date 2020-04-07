@@ -9,6 +9,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Toast;
 
 import com.example.tracker.R;
@@ -237,4 +238,9 @@ public class ShowTrackActivity extends FragmentActivity implements
         return xd[colorCount++];
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void centerMap(View view) {
+        //it will cause rewriting  of the map
+        onResume();
+    }
 }

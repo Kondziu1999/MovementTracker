@@ -37,21 +37,6 @@
             android:layout_marginTop="?attr/actionBarSize"
             tools:context=".MapsActivity" />
 
-        <Button
-            android:id="@+id/button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginEnd="284dp"
-            android:layout_marginRight="284dp"
-            android:layout_marginBottom="25dp"
-            android:onClick="getPosition"
-            android:text="@string/get_position"
-            android:textSize="14sp"
-            android:textStyle="bold" />
-
         <TextView
             android:id="@+id/distanceView"
             android:layout_width="137dp"
@@ -66,6 +51,43 @@
             android:gravity="center"
             android:textSize="24sp"
             android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="19dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginEnd="284dp"
+            android:layout_marginRight="284dp"
+            android:layout_marginBottom="25dp"
+            android:background="@drawable/custom_button"
+            android:onClick="getPosition"
+            android:text="@string/get_position"
+            android:textColor="@color/quantum_white_100"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <ImageButton
+            android:id="@+id/center_button"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_above="@+id/button"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginEnd="317dp"
+            android:layout_marginRight="317dp"
+            android:layout_marginBottom="18dp"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/round_button"
+            android:gravity="center_vertical|center_horizontal"
+            android:onClick="centerMap"
+            android:src="@drawable/ic_my_location" />
 
     </RelativeLayout>
 

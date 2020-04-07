@@ -73,10 +73,10 @@ public class MapsActivity extends AppCompatActivity
     private static final PatternItem DASH = new Dash(PATTERN_DASH_LENGTH_PX);
     private static final PatternItem GAP = new Gap(PATTERN_GAP_LENGTH_PX);
     private static final List<PatternItem> PATTERN_POLYLINE_DOTTED = Arrays.asList(GAP, DOT);
+    private boolean mapToCenter=true;
 
     private GoogleMap mMap;
     private Polyline polyline;
-
 
     int DELAY=10000;
     double LAST_CAPTURED_LONGITUDE=20.760;
@@ -193,7 +193,12 @@ public class MapsActivity extends AppCompatActivity
         // Style the polyline.
         stylePolyline(polyline);
         //move camera to center of markers when map will initialize
-        googleMap.setOnMapLoadedCallback(() ->googleMap.moveCamera(DistanceCalculator.setCenter(markers)));
+        //first time center and then when user click center button
+        if(mapToCenter){
+            mapToCenter=false;
+            googleMap.setOnMapLoadedCallback(() ->googleMap.moveCamera(DistanceCalculator.setCenter(markers)));
+        }
+
 
         googleMap.setOnPolylineClickListener(this);
         googleMap.setOnMarkerClickListener(this);
@@ -299,5 +304,11 @@ public class MapsActivity extends AppCompatActivity
         else {
             this.moveTaskToBack(true);
         }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void centerMap(View view) {
+        mapToCenter=true;
+        onResume();
     }
 }
