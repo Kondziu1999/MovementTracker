@@ -1,5 +1,6 @@
 package com.example.tracker;
 
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -89,6 +90,7 @@ public class MapsActivity extends AppCompatActivity
     private Handler refreshHandler;
     private List<Marker> markers=new ArrayList<>(20);
 
+    public static Activity activity;
     private DrawerLayout mDrawer;
     private Toolbar toolbar;
     private NavigationView nvDrawer;
@@ -99,6 +101,7 @@ public class MapsActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+        activity=this;
         //navigation drawer (side menu)
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -209,7 +212,7 @@ public class MapsActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-
+        //TODO check if comparing size of list can be replace by Observable<?>
         if(mLocalizationService!=null && !mLocalizationService.getLocations().isEmpty()){
             //if something changed
             if(mLocalizationService.getLocations().size()>=locations.size()){
