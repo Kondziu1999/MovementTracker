@@ -182,6 +182,7 @@ public class MapsActivity extends AppCompatActivity
         PolylineOptions polylineOptions=new PolylineOptions()
                 .clickable(true);
         //add points to polyline
+
         locations
                 .forEach(location-> {
                     LatLng position=new LatLng(location.getLat(),location.getLan());

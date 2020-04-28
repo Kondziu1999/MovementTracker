@@ -14,6 +14,7 @@ import com.example.tracker.models.LatLanHolder;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
@@ -38,9 +39,10 @@ public class LocalizationService extends Service {
     private LocationTrack locationTrack;
 
     int delay=10000;
-    private static final double VALID_DISTANCE_BETWEEN_SAMPLES=0.007; //7m
+    private static final double VALID_DISTANCE_BETWEEN_SAMPLES=0.01; //10m
     private static double TOTAL_DISTANCE=0;
     private double LAST_DISTANCE=0;
+    private Long LAST_TIMESTAMP=null;
 
     private final IBinder binder = new LocalBinder();
     public class LocalBinder extends Binder {
@@ -147,11 +149,24 @@ public class LocalizationService extends Service {
                 return true;
             }
             LAST_DISTANCE=distance;
+            if(calculateVelocity(distance)>10){
+                return false;
+            }
+            LAST_TIMESTAMP=System.nanoTime();
+
             return true;
         }
         return false;
     }
 
+    private Double calculateVelocity(double distance){
+            if(LAST_TIMESTAMP==null){
+                return 0.0;
+            }
+            long deltaTimeInSeconds=(System.nanoTime()-LAST_TIMESTAMP)/1000000000;
+
+            return (distance*1000)/deltaTimeInSeconds;
+    }
 
 
 }
