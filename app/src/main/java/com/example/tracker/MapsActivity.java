@@ -112,7 +112,7 @@ public class MapsActivity extends AppCompatActivity
         mDrawer.addDrawerListener(toggle);
 
         nvDrawer = (NavigationView) findViewById(R.id.nvView);
-        nvDrawer.inflateHeaderView(R.layout.nav_header);
+        //nvDrawer.inflateHeaderView(R.layout.nav_header);
         // Setup drawer view
         setNavigationViewListener(nvDrawer);
 
