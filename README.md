@@ -1,7 +1,7 @@
 # MovementTracker
 
 
-ANDROID APP FOR PURPUSE OF MODELING PEOPLE MOVEMENT.
+ANDROID APP FOR PURPOSE OF MODELING PEOPLE MOVEMENT.
 
 The purpose of this mobile app is to track human movment, validate GPS samples
 and store it in Firebase. Collected samples, which create full paths can be ploted on separate view.
