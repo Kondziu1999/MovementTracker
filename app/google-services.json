@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "760010464447",
+    "firebase_url": "https://movementtracker-8ee6d.firebaseio.com",
+    "project_id": "movementtracker-8ee6d",
+    "storage_bucket": "movementtracker-8ee6d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:760010464447:android:8b461eec4c16cd9deeba0a",
+        "android_client_info": {
+          "package_name": "com.example.tracker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "760010464447-f174rn7c5dmh2rcutcs2pgi3l0frgs0u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.tracker",
+            "certificate_hash": "ea5484f3e5915dd5a92c9b3b6ead51a4813c4daa"
+          }
+        },
+        {
+          "client_id": "760010464447-n8jae0lc9km1fj20dje5anksr8q9ner6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAAd9B6ZjPnRmCim9U8_Bi7bgYJNOQl-yU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "760010464447-n8jae0lc9km1fj20dje5anksr8q9ner6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

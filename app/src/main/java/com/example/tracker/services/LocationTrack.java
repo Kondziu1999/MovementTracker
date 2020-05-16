@@ -1,4 +1,4 @@
-package com.example.tracker;
+package com.example.tracker.services;
 
 import android.Manifest;
 import android.app.Activity;
@@ -17,6 +17,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
+
+import com.example.tracker.MapsActivity;
 
 public class LocationTrack extends Service implements LocationListener {
 
@@ -62,7 +64,7 @@ public class LocationTrack extends Service implements LocationListener {
                     if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                             ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                         //ask user for permissions
-                        ActivityCompat.requestPermissions((Activity) mContext, new String[] {
+                        ActivityCompat.requestPermissions(MapsActivity.activity, new String[] {
                                         Manifest.permission.ACCESS_FINE_LOCATION,
                                         Manifest.permission.ACCESS_COARSE_LOCATION},
                                 101);
@@ -88,7 +90,7 @@ public class LocationTrack extends Service implements LocationListener {
                 if (checkNetwork) {
                     if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                         //ask for permissions
-                        ActivityCompat.requestPermissions((Activity)mContext, new String[] {
+                        ActivityCompat.requestPermissions(MapsActivity.activity, new String[] {
                                         Manifest.permission.ACCESS_FINE_LOCATION,
                                         Manifest.permission.ACCESS_COARSE_LOCATION },
                                 101);
