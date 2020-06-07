@@ -1,7 +1,7 @@
 # MovementTracker
 
 
-ANDROID APP FOR PURPUSE OF MODELING PEOPLE MOVEMENT.
+ANDROID APP FOR PURPOSE OF MODELING PEOPLE MOVEMENT.
 
 The purpose of this mobile app is to track human movment, validate GPS samples
 and store it in Firebase. Collected samples, which create full paths can be ploted on separate view.
@@ -24,7 +24,7 @@ App require minumum android oreo (7) since it is being developed in Java 8.
 <img src="app/images/menu_1.jpg" width="200">
 <img src="app/images/menu_2.jpg" width="200">
   <br>
-  <h3>View to display choosen tracks</h3>
+  <h3>View to display chosen tracks</h3>
 <img src="app/images/summary.jpg" width="200">
 
 </div>
