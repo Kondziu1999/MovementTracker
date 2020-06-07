@@ -1,7 +1,6 @@
 package com.example.tracker.models;
 
 public class TrackDetails {
-
     private String date;
     private Double distance;
 

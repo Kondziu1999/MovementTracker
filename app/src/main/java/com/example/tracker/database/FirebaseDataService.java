@@ -34,7 +34,6 @@ import java.util.Map;
 import static android.content.ContentValues.TAG;
 
 public class FirebaseDataService {
-
     //NOTE service acts like a bean (singleton)
     private DatabaseReference databaseReference;
     private DatabaseReference infoReference;

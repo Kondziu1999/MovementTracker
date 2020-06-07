@@ -45,6 +45,7 @@ public class LocalizationService extends Service {
     private Long LAST_TIMESTAMP=null;
 
     private final IBinder binder = new LocalBinder();
+
     public class LocalBinder extends Binder {
         public LocalizationService getService() {
             // Return this instance of LocalService so clients can call public methods
