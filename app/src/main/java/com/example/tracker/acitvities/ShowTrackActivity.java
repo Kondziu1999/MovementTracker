@@ -67,6 +67,7 @@ public class ShowTrackActivity extends FragmentActivity implements
     private List<String> TRACK_IDS=new ArrayList<>();
     private List<List<LatLanHolder>> TRACKS_TO_PLOT=new ArrayList<>();
     private Integer TRACKS_TO_PLOT_COUNT=0;
+
     //color to style polyline
     private int colorCount=0;
     private List<Marker> markers=new ArrayList<>(20);

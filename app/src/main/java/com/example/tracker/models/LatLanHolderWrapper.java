@@ -3,7 +3,6 @@ package com.example.tracker.models;
 import java.util.List;
 
 public class LatLanHolderWrapper {
-
     private List<LatLanHolder> wrapper;
 
     public LatLanHolderWrapper(List<LatLanHolder> wrapper) {

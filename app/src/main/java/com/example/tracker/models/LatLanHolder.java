@@ -6,7 +6,6 @@ public class LatLanHolder {
 
     double lat;
     double lan;
-
     public LatLanHolder() {
     }
 

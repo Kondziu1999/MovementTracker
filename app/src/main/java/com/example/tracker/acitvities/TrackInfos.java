@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 public class TrackInfos extends AppCompatActivity {
+
     ListView listView;
     FirebaseDataService dataService;
     //fetched tracks Ids

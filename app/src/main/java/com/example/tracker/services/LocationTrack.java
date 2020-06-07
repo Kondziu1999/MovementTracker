@@ -26,7 +26,6 @@ public class LocationTrack extends Service implements LocationListener {
     boolean checkGPS = false;
     boolean checkNetwork = false;
     boolean canGetLocation = false;
-
     Location loc;
     double latitude;
     double longitude;
